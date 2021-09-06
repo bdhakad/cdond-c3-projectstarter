@@ -175,7 +175,7 @@ jobs:
             aws cloudformation \
             list-exports --query "Exports[?Name==\`PublicServerDNS\`].Value" \
             --no-paginate --output text > ~/textfile.txt
-      - run: cat textfile.txt
+      - run: cat ~/textfile.txt
       #     name: Add back-end ip to ansible inventory
       #     command: |
       #       # Your code here
