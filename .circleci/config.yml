@@ -47,17 +47,20 @@ jobs:
       - restore_cache:
           keys: [frontend-build]
       - run:
-          name: Build front-end
+          name: compile front-end 
           command: |
             cd frontend
-            npm i 
-            npm run build
+            npm run build    
       - run:
-          name: check vulnerabilities
+          name: lint front-end
           command: |
-            pwd
+            cd frontend
+            npm run lint
+      - run:
+          name: check vulnerabilities in front-end
+          command: |
+            cd frontend
             npm audit     
-
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -72,8 +75,14 @@ jobs:
   #     - run:
   #         name: Back-end build
   #         command: |
-  #            # Your code here
-  #            exit 1
+  #           cd backend
+  #           npm i
+  #           npm run build
+  #     - run:
+  #         name: check vulnerabilities
+  #         command: |
+  #           cd backend
+  #           npm audit       
   #     - save_cache:
   #         paths: [backend/node_modules]
   #         key: backend-build

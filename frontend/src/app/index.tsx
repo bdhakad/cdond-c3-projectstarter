@@ -24,7 +24,7 @@ export class Root extends React.Component<Props, State> {
           <Route exact path="/" render={() => <Redirect to="/employees" />} />
           <Route
             render={(props: RouteComponentProps<void>) => {
-              return <App {...props} />;
+              return <App? {...props} />;
             }}
           />
         </Switch>
