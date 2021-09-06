@@ -50,6 +50,7 @@ jobs:
           name: compile front-end 
           command: |
             cd frontend
+            npm i
             npm run build    
       - run:
           name: lint front-end
