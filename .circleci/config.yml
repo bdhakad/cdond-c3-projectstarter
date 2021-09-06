@@ -55,6 +55,7 @@ jobs:
       - run:
           name: check vulnerabilities
           command: |
+            pwd
             npm audit     
 
       - save_cache:
