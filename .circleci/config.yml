@@ -61,7 +61,7 @@ jobs:
           name: check vulnerabilities in front-end
           command: |
             cd frontend
-            npm audit     
+          # npm audit     
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
