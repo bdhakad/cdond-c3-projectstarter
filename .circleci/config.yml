@@ -1,22 +1,24 @@
 version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@2.0.3
-# commands:
-#   destroy-environment:
-#     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
-#     parameters:
-#       to:
-#         default: "world"
-#         type: string
-#       # Add parameter here   
-#     steps:
-#       - run:
-#           name: Destroy environments
-#           when: on_fail
-#           command: |
-#             # Your code here
-#             exit 1
-
+commands:
+  destroy-backend-environment:
+    description: Destroy back-end cloudformation stacks given a workflow ID.  
+    steps:
+      - run:
+          name: Destroy backend environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID:0:7}
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack --stack-name frontend-end-stack-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID:0:7}
   # revert-migrations:
   #   description: Revert the last migration if successfully run in the current workflow.
   #   parameters:
@@ -156,18 +158,21 @@ jobs:
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
-              --tags project=your-tag \
+              --tags project=udacity-backend \
               --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID:0:7} \
               --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} 
            #     exit 1
-      # - run:
-      #     name: Ensure front-end infrastructure exist
-      #     command: |
-      #       aws cloudformation deploy \
-      #         --template-file .circleci/files/frontend.yml \
-      #         --tags project=your-tag \
-      #         --stack-name frontend-stack-${CIRCLE_WORKFLOW_ID} \
-      #         --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}  
+      # Here's where you will add some code to rollback on failure     
+      - destroy-backend-environment
+      
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=udacity-frontend \
+              --stack-name frontend-stack-${CIRCLE_WORKFLOW_ID} \
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}  
            #   exit 1
       - run:
           name: Add back-end ip to ansible inventory
@@ -177,16 +182,12 @@ jobs:
             --no-paginate --output text > ~/textfile.txt
             value=`cat ~/textfile.txt`
             echo $value >> .circleci/ansible/inventory.txt
-      - run: cat .circleci/ansible/inventory.txt
-      #     name: Add back-end ip to ansible inventory
-      #     command: |
-      #       # Your code here
-      #       exit 1
-      # - persist_to_workspace:
-      #     root: ~/
-      #     paths:
-      #       - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure      
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt     
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment       
 
 #   configure-infrastructure:
 #     docker:
