@@ -157,19 +157,25 @@ jobs:
             aws cloudformation deploy \
               --template-file .circleci/files/backend.yml \
               --tags project=your-tag \
-              --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID} 
+              --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID:0:7} \
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7} 
            #     exit 1
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=your-tag \
-              --stack-name frontend-stack-${CIRCLE_WORKFLOW_ID} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}  
-           #   exit 1
       # - run:
+      #     name: Ensure front-end infrastructure exist
+      #     command: |
+      #       aws cloudformation deploy \
+      #         --template-file .circleci/files/frontend.yml \
+      #         --tags project=your-tag \
+      #         --stack-name frontend-stack-${CIRCLE_WORKFLOW_ID} \
+      #         --parameter-overrides ID=${CIRCLE_WORKFLOW_ID}  
+           #   exit 1
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws cloudformation \
+            list-exports --query "Exports[?Name==\`PublicServerDNS\`].Value" \
+            --no-paginate --output text > ~/textfile.txt
+      - run: cat textfile.txt
       #     name: Add back-end ip to ansible inventory
       #     command: |
       #       # Your code here
