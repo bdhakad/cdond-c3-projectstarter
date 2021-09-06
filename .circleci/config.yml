@@ -52,6 +52,11 @@ jobs:
             cd frontend
             npm i 
             npm run lint
+            npm run build
+      - run:
+          name: check vulnerabilities
+          command: |
+            npm audit     
 
       - save_cache:
           paths: [frontend/node_modules]
