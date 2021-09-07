@@ -17,8 +17,8 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name frontend-end-stack-${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudformation delete-stack --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name front-end-stack-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID:0:7}     
   # revert-migrations:
   #   description: Revert the last migration if successfully run in the current workflow.
   #   parameters:
@@ -133,7 +133,7 @@ jobs:
           name: scan front-end dependencies
           command: |
             cd frontend
-          # npm audit
+          # npm audit --audit-level=critical
 
   scan-backend:
     docker:
@@ -146,13 +146,14 @@ jobs:
           name: scan backend-end dependencies
           command: |
             cd backend
-          # npm audit
+          # npm audit --audit-level=critical
 
   deploy-infrastructure:
     docker:
       - image: amazon/aws-cli
     steps:
       - checkout
+      - run: yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -164,14 +165,13 @@ jobs:
            #     exit 1
       # Here's where you will add some code to rollback on failure     
       - destroy-backend-environment
-
       - run:
           name: Ensure front-end infrastructure exist
           command: |
             aws cloudformation deploy \
               --template-file .circleci/files/frontend.yml \
               --tags project=udacity-frontend \
-              --stack-name frontend-stack-${CIRCLE_WORKFLOW_ID:0:7} \
+              --stack-name front-end-stack-${CIRCLE_WORKFLOW_ID:0:7} \
               --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}  
            #   exit 1
       - run:
@@ -194,7 +194,7 @@ jobs:
 #       # Docker image here that supports Ansible
 #     steps:
 #       # Checkout code from git
-#       # Add ssh keys with fingerprint
+#       # Add ssh keys with fingerprint 4c:e6:72:4d:76:84:ef:12:2b:ea:d7:d5:66:d5:41:79
 #       # attach workspace
 #       - run:
 #           name: Install dependencies
@@ -251,7 +251,7 @@ jobs:
 #       # Docker image here that supports Ansible
 #     steps:
 #       # Checkout code from git
-#       # Add ssh keys with fingerprint
+#       # Add ssh keys with fingerprint 4c:e6:72:4d:76:84:ef:12:2b:ea:d7:d5:66:d5:41:79
 #       # attach workspace
 #       - run:
 #           name: Install dependencies
