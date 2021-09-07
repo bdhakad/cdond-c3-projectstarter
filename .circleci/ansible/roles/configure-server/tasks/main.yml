@@ -9,7 +9,6 @@
   apt:
     upgrade: yes
 
-
 - name: remove dependencies that are no longer required
   become: yes
   apt:
@@ -22,6 +21,13 @@
     state: latest
     update_cache: yes
 
+- name: "install zip unzip."
+  become: yes
+  apt:
+    name: ["zip", "unzip"]
+    state: latest
+    update_cache: yes    
+
 - name: "install pm2"
   become: yes
   npm:
@@ -30,10 +36,10 @@
     production: yes
     state: present
 
-- name: Creates directory
-  copy:
-    src:  /root/project/backend/dist/
-    dest: /home/ubuntu/
+# - name: Creates directory
+#   copy:
+#     src:  /root/project/backend/dist/
+#     dest: /home/ubuntu/
 
 # - name: Clone a github repository
 #   git:
