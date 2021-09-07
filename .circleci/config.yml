@@ -250,7 +250,7 @@ jobs:
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
             cat .env
             npm i
-            npm run migrations > migration.log
+            npm run migrations > migrations.log
             cat migrations.log
       - run:
           name: Send migration results to memstash
