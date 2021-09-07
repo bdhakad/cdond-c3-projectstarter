@@ -203,17 +203,10 @@ jobs:
           command: |
             apk add --update ansible 
       - run: cat .circleci/ansible/inventory.txt 
-      - run: cat project/.circleci/ansible/inventory.txt
       - run:
           name: configure server
           command: |
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
-      - destroy-environment    
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             exit 1
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml   
 #       - run:
 #           name: Configure server
 #           command: |
