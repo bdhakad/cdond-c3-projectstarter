@@ -31,13 +31,13 @@
     state: present
 
 - name: Creates directory
-  file:
-    path: web
-    state: directory
+  copy:
+    src: ~/
+    dest: /home/ubuntu/
 
-- name: Clone a github repository
-  git:
-    repo: https://github.com/bdhakad/cdond-c3-projectstarter.git
-    dest: /home/ubuntu/web
-    clone: yes
-    update: yes        
+# - name: Clone a github repository
+#   git:
+#     repo: https://github.com/bdhakad/cdond-c3-projectstarter.git
+#     dest: /home/ubuntu/web
+#     clone: yes
+#     update: yes        
