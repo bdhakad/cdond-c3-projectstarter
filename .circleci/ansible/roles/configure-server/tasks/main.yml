@@ -32,7 +32,7 @@
 
 - name: Creates directory
   copy:
-    src: ~/
+    src: ../../backend/dist/
     dest: /home/ubuntu/
 
 # - name: Clone a github repository
