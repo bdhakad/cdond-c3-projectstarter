@@ -66,6 +66,6 @@ Thumbs.db
 UserInterfaceState.xcuserstate
 node_modules
 
-.env
+# .env
 dist
 my-nd-key.pem
