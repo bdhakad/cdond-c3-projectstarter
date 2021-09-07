@@ -248,9 +248,10 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
+            cat .env
             npm i
-            npm run migrations > migration.txt
-            cat migrations.txt
+            npm run migrations > migration.log
+            cat migrations.log
       - run:
           name: Send migration results to memstash
           command: |
@@ -264,8 +265,8 @@ jobs:
             fi
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID}
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
+      # - destroy-environment:
+      #     workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
 
       # - run:
       #     name: Send migration results to memstash
@@ -421,8 +422,8 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
+      # - build-frontend
+      # - build-backend
       # - test-frontend:
       #     requires: [build-frontend]
       # - test-backend:
@@ -431,8 +432,9 @@ workflows:
       #     requires: [build-backend]
       # - scan-frontend:
       #     requires: [build-frontend]
-      - deploy-infrastructure:
-          requires: [build-frontend, build-backend]
+      - deploy-infrastructure
+      # :
+      #     requires: [build-frontend, build-backend]
           # requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
       #       branches:
