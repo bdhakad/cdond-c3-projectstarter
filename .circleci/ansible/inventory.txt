@@ -1,1 +1,2 @@
 [web]
+ec2-54-210-136-139.compute-1.amazonaws.com
