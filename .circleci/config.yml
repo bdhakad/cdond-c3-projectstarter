@@ -214,22 +214,25 @@ jobs:
 #             exit 1
 #       # Here's where you will add some code to rollback on failure      
 
-#   run-migrations:
-#     docker:
-#       # Docker image here that supports NodeJS
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Run migrations
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Send migration results to memstash
-#           command: |
-#             # Your code here
-#             exit 1
-#      # Here's where you will add some code to rollback on failure      
+  run-migrations:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Run migrations
+          command: |
+            npm i
+            npm run migrations >> migration.txt
+      - run: cat migration.txt      
+      # - run:
+      #     name: Send migration results to memstash
+      #     command: |
+      #       # Your code here
+      #       exit 1
+     # Here's where you will add some code to rollback on failure      
 
 #   deploy-frontend:
 #     docker:
@@ -330,19 +333,18 @@ jobs:
 workflows:
   default:
     jobs:
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
-      - deploy-infrastructure
-      # :
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
       #       branches:
       #         only: [test-feature-branch]
