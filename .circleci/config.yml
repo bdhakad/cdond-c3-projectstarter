@@ -441,8 +441,6 @@ jobs:
             echo $OldWorkflowID
             # push current workflow identifier for new deployment
             aws ssm put-parameter --name "OldWorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
-
-            
             if $OldWorkflowID
             then
               aws cloudformation delete-stack --stack-name back-end-end-stack-${OldWorkflowID}
