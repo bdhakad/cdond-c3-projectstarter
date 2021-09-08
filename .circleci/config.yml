@@ -438,12 +438,12 @@ jobs:
           command: |
             export OldWorkflowID=$(aws ssm get-parameter --name "OldWorkflowID" --with-decryption --output text --query Parameter.Value)
             aws ssm put-parameter --name "OldWorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
-            aws cloudformation delete-stack --stack-name "back-end-end-stack-${OldWorkflowID}"
+            aws cloudformation delete-stack --stack-name "back-end-stack-${OldWorkflowID}"
             # aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
             aws cloudformation delete-stack --stack-name "front-end-stack-${OldWorkflowID}"
             # if $OldWorkflowID
             # then
-            #   aws cloudformation delete-stack --stack-name back-end-end-stack-${OldWorkflowID}
+            #   aws cloudformation delete-stack --stack-name back-end-stack-${OldWorkflowID}
             #   aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
             #   aws cloudformation delete-stack --stack-name front-end-stack-${OldWorkflowID}
             # else
