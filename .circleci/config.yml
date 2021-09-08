@@ -443,10 +443,11 @@ jobs:
             aws ssm put-parameter --name "OldWorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
 
             if [ "${OldWorkflowID}" != "${CIRCLE_WORKFLOW_ID:0:7}" ]
-              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-              aws cloudformation delete-stack --stack-name "front-end-stack-${OldWorkflowID}"
-              aws cloudformation delete-stack --stack-name "back-end-end-stack-${OldWorkflowID}"
             then
+              aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+              aws cloudformation delete-stack --stack-name front-end-stack-${OldWorkflowID}
+              aws cloudformation delete-stack --stack-name back-end-end-stack-${OldWorkflowID}
+            else
               echo "No stacks to destroy"
             fi
             
