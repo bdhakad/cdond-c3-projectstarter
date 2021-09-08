@@ -442,15 +442,16 @@ jobs:
             # push current workflow identifier for new deployment
             aws ssm put-parameter --name "OldWorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
 
-            if [ "${OldWorkflowID}" != "${CIRCLE_WORKFLOW_ID:0:7}" ];
+            
+            if(( $OldWorkflowID!=${CIRCLE_WORKFLOW_ID:0:7} ));
             then
+              aws cloudformation delete-stack --stack-name back-end-end-stack-${OldWorkflowID}
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name front-end-stack-${OldWorkflowID}
-              aws cloudformation delete-stack --stack-name back-end-end-stack-${OldWorkflowID}
             else
               echo "No stacks to destroy"
             fi
-            
+    #        if [ "${OldWorkflowID}" != "${CIRCLE_WORKFLOW_ID:0:7}" ];
 
 workflows:
   default:
