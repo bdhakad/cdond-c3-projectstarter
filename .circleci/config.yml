@@ -317,10 +317,10 @@ jobs:
           command: |
             apk add --update ansible
             apk add --update zip
-            sudo apt-get update
-            sudo apt-get install python3
-            sudo apt-get install ansible
-            sudo apt-get install awscli
+            apt-get update
+            apt-get install python3
+            apt-get install ansible
+            apt-get install awscli
       - run:
           name: Add environment variables
           command: |
