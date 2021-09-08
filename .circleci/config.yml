@@ -182,9 +182,10 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory and Put backend url to MemCache
           command: |
-            backend_url=$(aws cloudformation \
-            list-exports --query "Exports[?Name==\`PublicServerDNS\`].Value" \
-            --no-paginate --output text)
+            backend_url=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicDnsName' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
             echo "backend_url:${backend_url}";
             echo "CIRCLE_WORKFLOW_ID:${CIRCLE_WORKFLOW_ID}";
             echo $backend_url >> .circleci/ansible/inventory.txt
