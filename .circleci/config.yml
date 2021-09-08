@@ -437,21 +437,21 @@ jobs:
           name: Remove old stacks and files
           command: |
             OldWorkflowID=$(aws ssm get-parameter \ 
-            --name "OldWorkflowID" \ 
-            --with-decryption --output text \ 
-            --query Parameter.Value)
+              --name "OldWorkflowID" \ 
+              --with-decryption --output text \ 
+              --query Parameter.Value)
 
             aws ssm put-parameter \ 
-            --name "OldWorkflowID" --type "String" \ 
-            --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
+              --name "OldWorkflowID" --type "String" \ 
+              --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
 
             aws cloudformation delete-stack \ 
-            --stack-name back-end-end-stack-${OldWorkflowID}
+              --stack-name back-end-end-stack-${OldWorkflowID}
 
             aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
 
             aws cloudformation delete-stack \ 
-            --stack-name front-end-stack-${OldWorkflowID}
+              --stack-name front-end-stack-${OldWorkflowID}
 
             if $OldWorkflowID
             then
