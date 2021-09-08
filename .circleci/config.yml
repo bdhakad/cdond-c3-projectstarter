@@ -436,10 +436,7 @@ jobs:
       - run:
           name: Remove old stacks and files
           command: |
-            # get old workflow identifier
             OldWorkflowID=$(aws ssm get-parameter --name "OldWorkflowID" --with-decryption --output text --query Parameter.Value)
-            echo $OldWorkflowID
-            # push current workflow identifier for new deployment
             aws ssm put-parameter --name "OldWorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
             if $OldWorkflowID
             then
