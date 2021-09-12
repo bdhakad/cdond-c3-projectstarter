@@ -22,3 +22,8 @@
   shell: |
     cd /home/ubuntu/backend
     pm2 start npm --name backend -- start
+
+- name: save your list of processes
+  shell: |
+    cd /home/ubuntu/backend
+    pm2 save    
