@@ -4,7 +4,7 @@ orbs:
   slack: circleci/slack@4.4.4   #OAuth token must be present via the SLACK_ACCESS_TOKEN environment variable to work
 commands:
   destroy-backend-environment:
-    description: Destroy back-end cloudformation stacks given a workflow ID.  
+    description: Destroy back-end cloudformation stacks given a workflow ID.
     steps:
       - run:
           name: Destroy backend environments
@@ -17,7 +17,7 @@ commands:
           template: basic_fail_1
 
   destroy-environment:
-    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.  
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       workflow_id:
         type: string
@@ -39,20 +39,20 @@ commands:
     parameters:
       workflow_id:
         type: string
-      # Add parameter here     
+      # Add parameter here
     steps:
       - run:
           name: Revert migrations
           when: on_fail
           command: |
             STATUS=$(curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7})
-            if(( $STATUS==1 )); 
+            if(( $STATUS==1 ));
             then
             cd ~/project/backend
             npm install
             npm run migrations:revert
             fi
-            
+
 jobs:
   build-frontend:
     docker:
@@ -61,18 +61,18 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - run: sudo apt-get install jq    
+      - run: sudo apt-get install jq
       - run:
-          name: compile front-end 
+          name: compile front-end
           command: |
             cd frontend
             npm i
-            npm run build    
+            npm run build
       - run:
           name: lint front-end
           command: |
             cd frontend
-            npm run lint     
+            npm run lint
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -84,7 +84,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run: sudo apt-get install jq    
+      - run: sudo apt-get install jq
       - run:
           name: compile back-end
           command: |
@@ -95,7 +95,7 @@ jobs:
           name: lint back-end
           command: |
             cd backend
-            npm run lint            
+            npm run lint
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
@@ -112,12 +112,12 @@ jobs:
           name: Run front-end tests
           command: |
             cd frontend
-            npm i 
-            npm run test    
+            npm i
+            npm run test
       # Checkout code from git
       # Restore from cache
       # Your job code here
-                
+
   test-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -130,9 +130,9 @@ jobs:
           name: Run back-end tests
           command: |
             cd backend
-            npm i 
-            npm run test 
-            
+            npm i
+            npm run test
+
   scan-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -145,7 +145,7 @@ jobs:
           name: Frontend build
           command: |
             cd frontend
-            npm i    
+            npm i
       - run:
           name: scan front-end dependencies
           command: |
@@ -185,7 +185,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=udacity-backend \
               --stack-name back-end-stack-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}      
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-backend-environment
       - run:
           name: Ensure front-end infrastructure exist
@@ -194,7 +194,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --tags project=udacity-frontend \
               --stack-name front-end-stack-${CIRCLE_WORKFLOW_ID:0:7} \
-              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}  
+              --parameter-overrides ID=${CIRCLE_WORKFLOW_ID:0:7}
 
       - run:
           name: Add back-end ip to ansible inventory and Put backend url to MemCache
@@ -209,10 +209,10 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/ansible/inventory.txt     
+            - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}      
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   configure-infrastructure:
     docker:
@@ -226,11 +226,11 @@ jobs:
       - run:
           name: install dependencies (awscli for rollback command)
           command: |
-            apk add --update ansible 
+            apk add --update ansible
             pip install awscli
-            apk add --update jq 
+            apk add --update jq
             apk add --update curl
-      - run: cat .circleci/ansible/inventory.txt 
+      - run: cat .circleci/ansible/inventory.txt
       - run:
           name: configure server
           command: |
@@ -245,9 +245,9 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml   
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}            
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   run-migrations:
     docker:
@@ -256,7 +256,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: sudo apt-get install jq    
+      - run: sudo apt-get install jq
       - run:
           name: Run migrations
           command: |
@@ -283,13 +283,13 @@ jobs:
             if [ $? -eq 0 ]; then
               echo "Database migration was successful"
               curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID}
-            else 
+            else
               exit 1;
             fi
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID}
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}          
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
   deploy-frontend:
     docker:
@@ -299,11 +299,11 @@ jobs:
       - run:
           name: Install dependencies (node for building front end and bash & curl for memstash)
           command: |
-            yum -y install tar gzip 
+            yum -y install tar gzip
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
             yum -y install nodejs
             yum install -y jq
-            cd frontend 
+            cd frontend
             npm i
       - run:
           name: Get backend url and build the front end
@@ -325,8 +325,8 @@ jobs:
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID}
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}      
-                    
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
   deploy-backend:
     docker:
       - image: python:3.7-alpine3.11
@@ -341,7 +341,7 @@ jobs:
           command: |
             apk add --update ansible
             apk add --update zip
-            apk add --update jq 
+            apk add --update jq
             apk add --update curl
             pip install awscli
             pip install nodejs
@@ -375,12 +375,12 @@ jobs:
             echo "backend_ip: ${backend_ip}"
             export ANSIBLE_HOST_KEY_CHECKING=False
             cat inventory.txt
-            ansible-playbook -i  inventory.txt deploy-backend.yml      
-       # Here's where you will add some code to rollback on failure 
+            ansible-playbook -i  inventory.txt deploy-backend.yml
+       # Here's where you will add some code to rollback on failure
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID}
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 
   smoke-test:
@@ -391,7 +391,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update jq 
+            apk add --update jq
             apk add --update curl
             pip install awscli
       - run:
@@ -400,7 +400,7 @@ jobs:
             backend_ip=$(curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET --data "${backend_url}" https://api.memstash.io/values/backend_url)
             ELASTIC_IP=$(aws ec2 describe-addresses --query 'Addresses[*].PublicIp' \
               --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
-            API_URL="http://${backend_ip}:3030/api/status"  
+            API_URL="http://${backend_ip}:3030/api/status"
             Elastic_API_URL="http://${ELASTIC_IP}:3030/api/status"
             echo $API_URL
             sleep 30
@@ -411,7 +411,7 @@ jobs:
           command: |
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"
             echo $URL
-            if curl -s ${URL} | grep "Welcome"  
+            if curl -s ${URL} | grep "Welcome"
             then
               echo "Frontend Smoke test successful."
               return 0
@@ -427,7 +427,7 @@ jobs:
       - slack/notify:
           channel: monitoring
           event: pass
-          template: basic_success_1     
+          template: basic_success_1
 
   cloudfront-update:
     docker:
@@ -440,7 +440,7 @@ jobs:
             curl -sL https://rpm.nodesource.com/setup_lts.x | bash -
             yum -y install nodejs
       - run: yum install -y tar gzip
-      - run: yum install -y jq      
+      - run: yum install -y jq
       - run:
           name: Update cloudfront distribution
           command: |
@@ -448,7 +448,7 @@ jobs:
               --template-file .circleci/files/cloudfront.yml \
               --tags project=udapeople-cloudfront \
               --stack-name udapeople-cloudfront-update \
-              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" 
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
       - revert-migrations:
           workflow_id: ${CIRCLE_WORKFLOW_ID}
       - destroy-environment:
@@ -456,8 +456,8 @@ jobs:
       - slack/notify:
           channel: monitoring
           event: pass
-          template: basic_success_1    
-  
+          template: basic_success_1
+
 
   cleanup:
     docker:
@@ -469,16 +469,16 @@ jobs:
       - run:
           name: Create CDN invalidation to pick new changes
           command: |
-            distributionId=${aws cloudformation describe-stacks --stack-name udapeople-cloudfront-update \ 
-              --query "Stacks[0].Outputs[?OutputKey=='WebpageCDN'].OutputValue" \  
+            distributionId=${aws cloudformation describe-stacks --stack-name udapeople-cloudfront-update \
+              --query "Stacks[0].Outputs[?OutputKey=='WebpageCDN'].OutputValue" \
               --output text)
-            aws cloudfront create-invalidation --distribution-id $distributionId --paths /    
+            aws cloudfront create-invalidation --distribution-id $distributionId --paths /
       - run:
           name: Remove old stacks and files
           command: |
             export OldWorkflowID=$(aws ssm get-parameter --name "OldWorkflowID" --with-decryption --output text --query Parameter.Value)
             aws ssm put-parameter --name "OldWorkflowID" --type "String" --value "${CIRCLE_WORKFLOW_ID:0:7}" --overwrite
-            
+
             if [ "${OldWorkflowID}" != "${CIRCLE_WORKFLOW_ID:0:7}" ];
             then
               aws cloudformation delete-stack --stack-name "back-end-stack-${OldWorkflowID}"
@@ -490,7 +490,7 @@ jobs:
       - slack/notify:
           channel: monitoring
           event: pass
-          template: basic_success_1      
+          template: basic_success_1
 
 workflows:
   default:
@@ -509,7 +509,7 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [master]
+              only: [develop]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
