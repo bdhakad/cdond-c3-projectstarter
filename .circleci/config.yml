@@ -308,8 +308,10 @@ jobs:
       - run:
           name: Get backend url and build the front end
           command: |
+            ELASTIC_IP=$(aws ec2 describe-addresses --query 'Addresses[*].PublicIp' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             backend_ip=$(curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET --data "${backend_url}" https://api.memstash.io/values/backend_url)
-            export API_URL="http://${backend_ip}:3030"
+            export API_URL="http://${ELASTIC_IP}:3030"
             echo "${API_URL}" >> "frontend/.env"
             echo "${API_URL}"
             cd frontend
@@ -396,10 +398,14 @@ jobs:
           name: Backend smoke test - Get backend url from memCache & curl to smoke test
           command: |
             backend_ip=$(curl -H "Content-Type: text/plain" -H "token: ${CIRCLE_WORKFLOW_ID}" --request GET --data "${backend_url}" https://api.memstash.io/values/backend_url)
-            API_URL="http://${backend_ip}:3030/api/status"
+            ELASTIC_IP=$(aws ec2 describe-addresses --query 'Addresses[*].PublicIp' \
+              --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+            API_URL="http://${backend_ip}:3030/api/status"  
+            Elastic_API_URL="http://${ELASTIC_IP}:3030/api/status"
             echo $API_URL
             sleep 30
             curl $API_URL
+            curl $Elastic_API_URL
       - run:
           name: Frontend smoke test - create front url & curl to smoke test
           command: |
