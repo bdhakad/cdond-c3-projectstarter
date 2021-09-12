@@ -61,7 +61,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - run: apt-get install jq    
+      - run: sudo apt-get install jq    
       - run:
           name: compile front-end 
           command: |
@@ -84,7 +84,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run: apt-get install jq    
+      - run: sudo apt-get install jq    
       - run:
           name: compile back-end
           command: |
@@ -107,7 +107,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - run: apt-get install jq
+      - run: sudo apt-get install jq
       - run:
           name: Run front-end tests
           command: |
@@ -125,7 +125,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run: apt-get install jq
+      - run: sudo apt-get install jq
       - run:
           name: Run back-end tests
           command: |
@@ -140,7 +140,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [frontend-build]
-      - run: apt-get install jq
+      - run: sudo apt-get install jq
       - run:
           name: Frontend build
           command: |
@@ -159,7 +159,7 @@ jobs:
       - checkout
       - restore_cache:
           keys: [backend-build]
-      - run: apt-get install jq
+      - run: sudo apt-get install jq
       - run:
           name: Backend build
           command: |
@@ -256,7 +256,7 @@ jobs:
       - checkout
       - attach_workspace:
           at: ~/
-      - run: apt-get install jq    
+      - run: sudo apt-get install jq    
       - run:
           name: Run migrations
           command: |
