@@ -47,6 +47,6 @@ Outputs:
 
   CloudFrontDistribution:
     Description: 'CloudFront URL'
-    Value: !GetAtt WebpageCDN.DomainName
+    Value: !Join ['http://', !GetAtt WebpageCDN.DomainName]
     Export:
-      Name: CloudFrontURL    
+      Name: CloudFrontURL 
